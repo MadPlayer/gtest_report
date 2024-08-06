@@ -1,5 +1,8 @@
 # GTestReport
+port gtest report script to python3
+now support for single xml file processing
 
+## old Readme
 Pyton 2.* script which generate rather simple HTML output in "out/"directory based on xml gtests repors from "in/" directory.
 Clone it and use "generate.(sh|bat)" as startup script. Script was tested with xml output format from gtest-1.7.0.
 
