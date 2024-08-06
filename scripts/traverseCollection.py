@@ -12,9 +12,9 @@ def extractCssClass(ctr):
     if hasattr(ctr, "cssClass"):
         cssClass = ctr.cssClass
         del ctr.cssClass
-        fields = {field: value for field, value in ctr.__dict__.items() if not callable(getattr(ctr, field))}
-        if len(fields.values()) != 1: raise Exception("Problems cssClass field can be applied only for class with two fields")
-        ctr = fields.values()[0];
+        fields = {field: value for field, value in list(ctr.__dict__.items()) if not callable(getattr(ctr, field))}
+        if len(list(fields.values())) != 1: raise Exception("Problems cssClass field can be applied only for class with two fields")
+        ctr = list(fields.values())[0];
 
     return (cssClass, ctr)
 
@@ -59,10 +59,10 @@ def generateElements(ctr, expandTypeIsRow):
     if (type(ctr) == list or type(ctr) == tuple):
         xRes = genIterative(ctr, "", expandTypeIsRow)
     elif (type(ctr) == dict):
-        xRes = genIterative( map(None, ctr.keys(), ctr.values()), cssClass, expandTypeIsRow)
+        xRes = genIterative( map(None, list(ctr.keys()), list(ctr.values())), cssClass, expandTypeIsRow)
     elif hasattr(ctr, "__dict__"):
-         fields = {field: value for field, value in ctr.__dict__.items() if not callable(getattr(ctr, field))}
-         xRes = genIterative(map(None, fields.keys(), fields.values()), cssClass, expandTypeIsRow)
+         fields = {field: value for field, value in list(ctr.__dict__.items()) if not callable(getattr(ctr, field))}
+         xRes = genIterative(map(None, list(fields.keys()), list(fields.values())), cssClass, expandTypeIsRow)
     else:
         if not expandTypeIsRow:
             xRes = "<td>" + str(ctr) + "</td>"
@@ -85,4 +85,4 @@ if __name__ == '__main__':
     a=A()   
     a.values = [1,2,3,4, None];
     a.cssClass = "wow"
-    print generateHtmlDocument(a)
+    print(generateHtmlDocument(a))

@@ -44,25 +44,25 @@ class Empty: pass
 def process(outFname, files):
     tableHeader = '''<th>Test name</th>'''
 
-    print "Generate HTML report based on this reports:", files
-    print "Output HTML report filename:", outFname
+    print("Generate HTML report based on this reports:", files)
+    print("Output HTML report filename:", outFname)
 
     if (len(files) == 0):
-        print "Please provide at least one report xml files..."
+        print("Please provide at least one report xml files...")
         return -2
 
     ctr = []
     report = ""
 
     # collect info from reports 
-    for f in xrange(0, len(files)):
+    for f in range(0, len(files)):
         ctr.append({})
         xmlFile = parse(files[f])
         fileBaseName = os.path.basename(files[f])
 
         for node in xmlFile.getElementsByTagName("testcase"):
             extra_content = ""
-            for k,v in (node.attributes.items()):
+            for k,v in (list(node.attributes.items())):
                 if k == "name" or k == "status" or k == "time" or k == "classname":
                     continue
                 appendMsg = str(k) + ":" + str(v) + "\n"
@@ -101,7 +101,7 @@ def process(outFname, files):
         failures = xmlFile.getElementsByTagName("testsuites")[0].attributes["failures"].value
 
         timeStamp = ""
-        if xmlFile.getElementsByTagName("testsuites")[0].attributes.has_key("timestamp"):
+        if "timestamp" in xmlFile.getElementsByTagName("testsuites")[0].attributes:
             timeStamp = xmlFile.getElementsByTagName("testsuites")[0].attributes["timestamp"].value
 
         report += generateElements([(files[f], len(ctr[f]), failures, totalTime, timeStamp)], True)
@@ -112,20 +112,20 @@ def process(outFname, files):
 
     #Create Final ctr
     finalCtr = {}
-    for i in xrange(0, len(ctr)):
-        for k in ctr[i].keys():
+    for i in range(0, len(ctr)):
+        for k in list(ctr[i].keys()):
            finalCtr[k] = ["---"] * (len(ctr) * 2 + 1)
 
-    for i in xrange(0, len(ctr)):
-        for k in ctr[i].keys():
+    for i in range(0, len(ctr)):
+        for k in list(ctr[i].keys()):
            finalCtr[k][0] = ctr[i][k][0]       #name
            finalCtr[k][1+(2*i)] = ctr[i][k][1] #time
            finalCtr[k][2+(2*i)] = ctr[i][k][2] #status
 
-    for k in finalCtr.keys():
+    for k in list(finalCtr.keys()):
         maxTimeReport = 0
         minTimeReport = 0
-        for i in xrange(0, len(ctr)):
+        for i in range(0, len(ctr)):
             if (finalCtr[k][1 + 2*i] > finalCtr[k][1 + 2*maxTimeReport]): maxTimeReport = i
             if (finalCtr[k][1 + 2*i] < finalCtr[k][1 + 2*maxTimeReport]): minTimeReport = i       
         if (finalCtr[k][1 + 2*minTimeReport] != finalCtr[k][1 + 2*maxTimeReport]):
@@ -144,15 +144,15 @@ def process(outFname, files):
             finalCtr[k][1 + 2*maxTimeReport].value = maxv
             finalCtr[k][1 + 2*maxTimeReport].cssClass = "up"
 
-    htmlDocument = htmlDocumentText.format(rows = generateElements(finalCtr.values(), True), tableHeader = tableHeader, report = reportHeader + report)
+    htmlDocument = htmlDocumentText.format(rows = generateElements(list(finalCtr.values()), True), tableHeader = tableHeader, report = reportHeader + report)
 
-    with open(outFname, "wb") as writer:    
+    with open(outFname, "w") as writer:    
         writer.write(htmlDocument)
 
 if __name__ == '__main__':
     if (len(sys.argv) == 1):
         print( "Generate html report from some google test xml reports v1.0.\n")
-	sys.exit(2)
+        sys.exit(2)
 
     destDir = os.path.dirname(sys.argv[1])
 
